@@ -1,3 +1,30 @@
+# ApiDemo (luis' comments)
+
+The app was created by:
+
+    ```
+    $ ng new api-demo --inline-style --inline-template --skip-tests
+    ```
+
+it has options for SASS and Zoneless app.
+
+the main.ts bootstraps the angular application
+
+I added Tailwind.css for styling. the angular.dev/guide/tailwind
+
+    ```
+    npm install tailwindcss @tailwindcss/postcss postcss
+    npm audit fix --force
+
+    ```
+I added the .postcssrc.json file
+I edited the src/sthiles.scss adding a `@use 'tailwindcss'` line and other definitions
+
+With that the project is ready to work.
+
+
+__the following was the automatically created README content__
+
 # ApiDemo
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.2.
