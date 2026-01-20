@@ -20,6 +20,14 @@ I added Tailwind.css for styling. the angular.dev/guide/tailwind
 I added the .postcssrc.json file
 I edited the src/sthiles.scss adding a `@use 'tailwindcss'` line and other definitions
 
+I also added angular material, Strange enough, after installing the package it gave me a "can't find module 'typescript'" error message, so I installed both like:
+
+    ```
+    npm install typesctipt --save-dev
+
+    npm install @angular/material
+    ```
+
 With that the project is ready to work.
 
 
