@@ -5,6 +5,8 @@
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
 @use '@angular/material' as mat;
+@use 'tailwindcss';
+@use '@ngxpert/hot-toast/styles';   // Importing @ngxpert/hot-toast SCSS file.
 
 html {
   @include mat.theme((
@@ -39,9 +41,6 @@ body {
 // components according to the Material 3 design spec.
 // Learn more about theming and how to use it for your application's
 // custom components at https://material.angular.dev/guide/theming
-@use '@angular/material' as mat;
-@use 'tailwindcss';
-@use '@ngxpert/hot-toast/styles';   // Importing @ngxpert/hot-toast SCSS file.
 
 html {
   @include mat.theme((
@@ -84,3 +83,50 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
 }
 
+// Custom styles 
+
+h1 {
+  font-size: 2rem;
+  font-weight: 500;
+  padding-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 500;
+  margin: 0;
+  padding-top: 1rem;
+  padding-bottom: 0.4rem;
+}
+
+p {
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+ul {  
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.3rem;
+}
+
+// OVERRIDES FOR ANAHUAC BUTTONS
+
+.custom-anahuac-button {
+  @include mat.button-overrides((
+    // For filled buttons (raised, flat, fab)
+    filled-container-color: rgb(226, 118, 17),
+    filled-label-text-color: black,
+
+    // For outlined buttons
+    outlined-outline-color: orange,
+    outlined-label-text-color: orange,
+
+    // For text buttons (mat-button)
+    text-label-text-color: orange,
+
+  ));
+}
