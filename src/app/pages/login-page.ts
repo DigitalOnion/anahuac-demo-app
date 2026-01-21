@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatAnchor } from "@angular/material/button";
-import { RouterLink } from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { verifyUserLoginSignal } from '../data/signal-store';
+import { VerifyLoginService, VerifyLoginType } from '../model/verify-login.service';
+import { HotToastService } from '@ngxpert/hot-toast';
 
 @Component({
   selector: 'app-login-page',
@@ -19,7 +22,7 @@ import { RouterLink } from "@angular/router";
 
           <div class="flex flex-column mt-8 w-full gap-4">
             <button matButton="outlined" class="custom-anahuac-button w-full" routerLink="/portal">Cancelar</button>
-            <button matButton="filled" class="custom-anahuac-button w-full" routerLink="/working">Login</button>
+            <button matButton="filled" class="custom-anahuac-button w-full" routerLink="/working" (click)="verifyUser($event)">Login</button>
           </div>
         </form>
 
@@ -32,8 +35,35 @@ import { RouterLink } from "@angular/router";
   styles: ``,
 })
 export class LoginPage {
+  private loginService = inject(VerifyLoginService);
+  private router = inject(Router);
+  private toast = inject(HotToastService);
+  
   loginForm = new FormGroup({
     username: new FormControl(''),
     password: new FormControl('')
   });
+
+  ngOnInit() {
+    verifyUserLoginSignal.set(false);
+  }
+
+  verifyUser(event: Event) {
+    const username = this. loginForm.get('username')?.value;
+    const password = this.loginForm.get('password')?.value;
+
+    this.loginService.verifyPromise(username as string, password as string)
+      .then((verifyString: string) => {
+        let verify: VerifyLoginType = JSON.parse(verifyString);
+        verifyUserLoginSignal.set(verify.isAuthenticated)
+        if(verify.isAuthenticated) {
+          this.router.navigate(['/working']);
+        } else {
+          this.toast.error("Login failed: " + verify.message);
+          event.preventDefault();
+        }
+      }
+    )
+  }
 }
+   
