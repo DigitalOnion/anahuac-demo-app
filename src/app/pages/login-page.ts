@@ -6,6 +6,8 @@ import { verifyUserLoginSignal } from '../data/signal-store';
 import { VerifyLoginService, VerifyLoginType } from '../model/verify-login.service';
 import { HotToastService } from '@ngxpert/hot-toast';
 
+import { tickerSignal } from '../data/signal-store';
+
 @Component({
   selector: 'app-login-page',
   imports: [ReactiveFormsModule, MatAnchor, RouterLink],
@@ -45,6 +47,7 @@ export class LoginPage {
   });
 
   ngOnInit() {
+    tickerSignal.set('');
     verifyUserLoginSignal.set(false);
   }
 

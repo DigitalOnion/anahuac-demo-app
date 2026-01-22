@@ -1,30 +1,14 @@
-import { computed, inject, signal } from '@angular/core';
-import { signalStore, withState, withComputed, withMethods, signalMethod, patchState } from '@ngrx/signals';
-import { produce } from 'immer';
-import { HotToastService } from '@ngxpert/hot-toast';
-
+import { signal } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 export const verifyUserLoginSignal = signal(false);
 
-// const initialState = {
-//     user: "",   
-//     isLoggedIn: false,
-// }
+export const tickerSignal = signal<string>('');
 
-// export const demoSignalStore = signalStore(
+export const datasetSubject = new BehaviorSubject<DataPointType[]>([]);
 
-//   { providedIn: 'root' },           // provided at the root level
-
-//   withState( initialState ),        // signalStore creates signals for each property in initialState
- 
-// //   withMethods ((store) => ({   
-// //             updateIsLoggedIn: signalMethod( async (isLoggedIn: boolean) => {
-// //             patchState(store, {
-// //                 isLoggedIn: isLoggedIn
-// //                 });  
-// //             })
-// //         })    
-// //     )
-// )
-
+export type DataPointType = {
+  x: Date;
+  y: number;
+};
 

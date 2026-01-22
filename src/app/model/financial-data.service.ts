@@ -1,0 +1,41 @@
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { lastValueFrom } from 'rxjs';
+
+const MASIVE_HOST = 'api.massive.com';
+const AUTHORIZATION = 'Bearer WV75pNWNzz9Ss0UAjjsB5jWc2jINbxhT'   // TODO: move to secure storage
+
+export type DataPoint = {
+    x: Date,
+    y: number
+  }
+
+@Injectable({
+  providedIn: 'root',
+})
+export class FinancialDataService {
+  private http = inject(HttpClient)
+
+  async getDataSetPromise(ticker: string, initialDate: Date, endingDate: Date): Promise<DataPoint[]> {
+    const iniDate = initialDate.toISOString().split('T')[0]       // like '2025-12-01'
+    const endDate = endingDate.toISOString().split('T')[0]        // like '2025-12-31'
+    const baseURL = 'https://api.massive.com';
+    const endpoint = `/v2/aggs/ticker/${ticker}/range/1/day/${iniDate}/${endDate}?sort=asc&limit=365`
+    const url = baseURL + endpoint;    
+    const postRequestObservable = this.http.get<string>(
+      url, 
+      {headers: {"Host": MASIVE_HOST, "Authorization": AUTHORIZATION }} 
+    );
+    return lastValueFrom(postRequestObservable)
+    .then((response: any) => {
+      const dataSet = response.results.map((item: any) => {
+        return { x: new Date(item.t), y: item.c }
+      })
+      return dataSet;
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+      return [];
+    });
+  }
+}
