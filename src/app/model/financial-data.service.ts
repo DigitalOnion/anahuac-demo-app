@@ -2,8 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 
+import {environment} from '../../environments/environment';
+
 const MASIVE_HOST = 'api.massive.com';
-const AUTHORIZATION = 'Bearer WV75pNWNzz9Ss0UAjjsB5jWc2jINbxhT'   // TODO: move to secure storage
+const AUTHORIZATION = 'Bearer' 
 
 export type DataPoint = {
     x: Date,
@@ -23,7 +25,9 @@ export type FinancialDataset = {
 export class FinancialDataService {
   private http = inject(HttpClient)
 
+  
   async getDataSetPromise(ticker: string, initialDate: Date, endingDate: Date): Promise<FinancialDataset> {
+    const apiKey = environment.apiKey;
     const iniDate = initialDate.toISOString().split('T')[0]       // like '2025-12-01'
     const endDate = endingDate.toISOString().split('T')[0]        // like '2025-12-31'
     const baseURL = 'https://api.massive.com';
@@ -31,7 +35,7 @@ export class FinancialDataService {
     const url = baseURL + endpoint;    
     const postRequestObservable = this.http.get<string>(
       url, 
-      {headers: {"Host": MASIVE_HOST, "Authorization": AUTHORIZATION }} 
+      {headers: {"Host": MASIVE_HOST, "Authorization": `${AUTHORIZATION} ${apiKey}` }} 
     );
     return lastValueFrom(postRequestObservable)
     .then((response: any) => {

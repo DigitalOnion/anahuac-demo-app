@@ -99,8 +99,8 @@ export const appSignalStore = signalStore(
       effect(() => {
         if (store.chartObject() !== undefined) {
           store.chartObject().options.data[0].dataPoints = store.dataset();
-          store.chartObject().subtitles[0].remove();
-          store.chartObject().render();
+          store.chartObject()?.subtitles[0]?.remove();
+          store.chartObject()?.render();
         }
       })
     },
