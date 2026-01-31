@@ -65,12 +65,12 @@ export class LoginPage {
     const username = this.loginForm.get('username')?.value;
     const password = this.loginForm.get('password')?.value;
 
-    await this.store.login(username ? username : '', password ? password : '');
+    let loginResult = await this.store.login(username ? username : '', password ? password : '');
 
-    if (this.store.verifyUserLogin().isAuthenticated) {
+    if (loginResult.isAuthenticated) {
       this.router.navigate(['/working']);
     } else {
-      this.toast.error('Login failed: ' + this.store.verifyUserLogin().message);
+      this.toast.error(`Login failed: ${this.store.verifyUserLogin().message}`);
       event.preventDefault();
     }
   }

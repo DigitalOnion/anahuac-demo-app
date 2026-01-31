@@ -10,13 +10,20 @@ export type DataPoint = {
     y: number
   }
 
+export type FinancialDataset = {
+  isOk: boolean,
+  dataset: DataPoint[],
+  ticker: string,
+  message: string,
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class FinancialDataService {
   private http = inject(HttpClient)
 
-  async getDataSetPromise(ticker: string, initialDate: Date, endingDate: Date): Promise<DataPoint[]> {
+  async getDataSetPromise(ticker: string, initialDate: Date, endingDate: Date): Promise<FinancialDataset> {
     const iniDate = initialDate.toISOString().split('T')[0]       // like '2025-12-01'
     const endDate = endingDate.toISOString().split('T')[0]        // like '2025-12-31'
     const baseURL = 'https://api.massive.com';
@@ -30,12 +37,16 @@ export class FinancialDataService {
     .then((response: any) => {
       const dataSet = response.results.map((item: any) => {
         return { x: new Date(item.t), y: item.c }
-      })
-      return dataSet;
+      }) 
+      return {
+        isOk: true,
+        dataset: dataSet,
+        ticker: ticker,
+        message: "Success"
+      }
     })
     .catch((error) => {
-      console.error('Error fetching data:', error);
-      return [];
+      throw error
     });
   }
 }

@@ -11,13 +11,17 @@ import { appSignalStore, DataPointType } from '../data/signal-store';
   imports: [CommonModule, CanvasJSAngularChartsModule, MatFormFieldModule, MatSelectModule],
   template: `
     <div class="max-w-[1200px] mx-auto w-full h-full bg-transparent">
-      @if (store.ticker()) {
+      @if (store.ticker() && store.status()=="ok") {
         <canvasjs-chart
           [options]="getChartOptions(this.store.ticker(), store.dataset())"
           [styles]="{ width: '100%', height: '60%' }"
           (chartInstance)="getChartInstance($event)"
         />
-      }
+      } @else if (store.ticker()) {
+        <p>&nbsp;</p>
+      } @else if (store.status()=='error') {
+        <p>Error al descargar los datos para la grafica.</p>
+      } 
     </div>
   `,
   styles: ``,

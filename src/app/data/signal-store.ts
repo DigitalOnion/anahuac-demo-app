@@ -1,9 +1,12 @@
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 
 import { effect, inject, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { VerifyLoginService, VerifyLoginType } from '../model/verify-login.service';
-import { FinancialDataService } from '../model/financial-data.service';
+import { FinancialDataService, FinancialDataset } from '../model/financial-data.service';
+import { HotToastService } from '@ngxpert/hot-toast';
+
+const MESSAGE_429 = "Se excedió el número autorizado de solicitudes por minuto. Intentalo de nuevo en un minuto"
+const FIN_SERVICE_ERROR = "Error al acceder el servicio financiero"
 
 export type DataPointType = {
   x: Date;
@@ -15,6 +18,7 @@ type signalState = {
   ticker: string,
   timeSpanMonths: number,
   dataset: DataPointType[],
+  status: string,
   chartObject: any;
 }
 
@@ -26,15 +30,12 @@ const initialState = {
     token: -1,
     error: null
   },
-  ticker: 'MSFT',
+  ticker: '',
   timeSpanMonths: 1,
   dataset: [],
+  status: 'ok',
   chartObject: undefined,
 } as signalState;
-
-const dateMinusMonths = (date: Date, months: number): Date => {
-    return new Date(date.getFullYear(), date.getMonth() - months, date.getDate());
-  }
 
 export const appSignalStore = signalStore(
   { providedIn: 'root' },
@@ -43,16 +44,20 @@ export const appSignalStore = signalStore(
   withMethods((state, 
       loginService: VerifyLoginService = inject(VerifyLoginService),
       financialDataService = inject(FinancialDataService),
+      toast = inject(HotToastService),
+
     ) => ({
-    login: async (username: string, password: string) => {
-      loginService.verifyPromise(username, password)
+    login: async (username: string, password: string): Promise<VerifyLoginType> => {
+      return loginService.verifyPromise(username, password)
         .then(verifyString => {
           let vls = JSON.parse(verifyString) as VerifyLoginType
           patchState(state, { verifyUserLogin: vls})
+          return vls
         })
         .catch(error => {
           console.error(error)
           patchState(state, {verifyUserLogin: initialState.verifyUserLogin})
+          return initialState.verifyUserLogin
         })
     },
     
@@ -61,11 +66,12 @@ export const appSignalStore = signalStore(
       const iniDate: Date = new Date(endDate.getFullYear(), endDate.getMonth() - state.timeSpanMonths() , endDate.getDate())
 
       financialDataService.getDataSetPromise(state.ticker(), iniDate, endDate)
-        .then((dataPoints: DataPointType[]) => {
-          patchState(state, {dataset: dataPoints})
+        .then((finDataset: FinancialDataset) => {
+          patchState(state, {dataset: finDataset.dataset, status: "ok"})
         })
         .catch((error) => {
-          patchState(state, {dataset: []} )
+          patchState(state, {dataset: [], status: "error"} )
+          toast.error(error.status == 429 ? MESSAGE_429 : FIN_SERVICE_ERROR)
           console.error('Error fetching data:', error);
         })
     },
