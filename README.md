@@ -17,8 +17,14 @@ I added Tailwind.css for styling. the angular.dev/guide/tailwind
     npm audit fix --force
 
     ```
-I added the .postcssrc.json file
-I edited the src/sthiles.scss adding a `@use 'tailwindcss'` line and other definitions
+I added the .postcssrc.json file with the content:
+{
+  "plugins": {
+    "@tailwindcss/postcss": {}
+  }
+}
+
+I edited the src/styles.scss adding a `@use 'tailwindcss'` line and other definitions
 
 I also added angular material, Strange enough, after installing the package it gave me a "can't find module 'typescript'" error message, so I installed both like:
 

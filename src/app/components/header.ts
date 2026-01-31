@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatButton, MatAnchor } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { verifyUserLoginSignal } from '../data/signal-store';
+import { appSignalStore } from '../data/signal-store';
 import { TickerDropdown } from './ticker-dropdown';
 
 @Component({
@@ -23,21 +23,29 @@ import { TickerDropdown } from './ticker-dropdown';
         </div>
       </div>
 
-      <div class="flex flex-col justify-end">
-        @if (signal()) {
-          <button matButton="filled" class="custom-anahuac-button" routerLink="/login">logout</button>
-        } @else {
-          <button matButton="filled" class="custom-anahuac-button" routerLink="/login">login</button>
-        }
-        <p>&nbsp;</p>
-        @if (signal()) {
-          <app-ticker-dropdown />
-        }
+      <div class="flex flex-col justify-start space-between" style="width: 100%;">
+        <div class="flex flex-row justify-end">
+          @if (this.store.verifyUserLogin().isAuthenticated) {
+            <button matButton="filled" class="custom-anahuac-button" routerLink="/login">logout</button>
+          } @else {
+            <button matButton="filled" class="custom-anahuac-button" routerLink="/login">login</button>
+          }
+        </div>
+        <div class="flex flex-1">
+          &nbsp;
+        </div>
+        <div class="flex flex-row justify-end">
+          @if (this.store.verifyUserLogin().isAuthenticated) {
+            <app-ticker-dropdown />
+          } @else {
+            <p>&nbsp;</p>
+          }
+        </div>
       </div>
     </header>
   `,
   styles: ``,
 })
 export class Header {
-  signal = verifyUserLoginSignal;
+  store = inject(appSignalStore);
 }

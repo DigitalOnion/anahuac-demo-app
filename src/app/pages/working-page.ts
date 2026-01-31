@@ -1,14 +1,9 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { CanvasJSAngularChartsModule } from '@canvasjs/angular-charts';
-import { FinancialDataService } from '../model/financial-data.service';
-import { DataPointType } from '../data/signal-store';
-
-import { tickerSignal } from '../data/signal-store';
-import { datasetSubject } from '../data/signal-store';
-
+import { appSignalStore, DataPointType } from '../data/signal-store';
 
 @Component({
   selector: 'app-working-page',
@@ -16,9 +11,9 @@ import { datasetSubject } from '../data/signal-store';
   imports: [CommonModule, CanvasJSAngularChartsModule, MatFormFieldModule, MatSelectModule],
   template: `
     <div class="max-w-[1200px] mx-auto w-full h-full bg-transparent">
-      @if (tickerSignalLocal()) {
+      @if (store.ticker()) {
         <canvasjs-chart
-          [options]="getChartOptions(tickerSignalLocal(), dataPoints)"
+          [options]="getChartOptions(this.store.ticker(), store.dataset())"
           [styles]="{ width: '100%', height: '60%' }"
           (chartInstance)="getChartInstance($event)"
         />
@@ -28,21 +23,11 @@ import { datasetSubject } from '../data/signal-store';
   styles: ``,
 })
 export class WorkingPage {
-  dataPoints: any = [];
-  chart: any;
-  tickerSignalLocal = tickerSignal
 
-  financialDataService = inject(FinancialDataService);
-
-  datasetSubscription = datasetSubject.subscribe((dataPoints: DataPointType[]) => {
-    this.dataPoints = dataPoints;
-    this.chart.options.data[0].dataPoints = this.dataPoints;
-    this.chart.subtitles[0].remove();
-    this.chart.render();
-  });
+  store = inject(appSignalStore)
 
   getChartInstance(chart: object) {
-    this.chart = chart;
+    this.store.setChartObject(chart);
   }
 
   getChartOptions(ticker: string, dataPoints: DataPointType[]) {

@@ -2,15 +2,24 @@ import { Component, inject, signal } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 
-import { DataPointType, tickerSignal } from '../data/signal-store';
-import { datasetSubject } from '../data/signal-store';
-import { FinancialDataService } from '../model/financial-data.service';
+import { appSignalStore } from '../data/signal-store';
+
+import { MatRadioModule } from '@angular/material/radio';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-ticker-dropdown',
-  imports: [MatFormFieldModule, MatSelectModule],
+  imports: [MatFormFieldModule, MatSelectModule, MatRadioModule, FormsModule],
   template: `
-    <mat-form-field>
+  <div class="flex flex-row justify-end">
+    <div class="flex flex-row justify-end mr-4">
+      <mat-radio-group aria-label="Select the Time Span" (ngModel)="store.timeSpanMonths()" (change)="onChangeTimeSpan($event)">
+        <mat-radio-button value="1">1 month</mat-radio-button>
+        <mat-radio-button value="6">6 months</mat-radio-button>
+        <mat-radio-button value="12">12 months</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <mat-form-field appearance="fill" >
       <mat-label>Símbolo o Ticker</mat-label>
       <mat-select (valueChange)="onChangeTicker($event)">
         @for (ticker of tickerListSignal(); track ticker) {
@@ -18,22 +27,22 @@ import { FinancialDataService } from '../model/financial-data.service';
         }
       </mat-select>
     </mat-form-field>
+  </div>
   `,
   styles: ``,
 })
 export class TickerDropdown {
-  tickerListSignal = signal<string[]>(['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'ORCL', 'NVDA', 'IBM', 'INTC']);
-  financialDataService = inject(FinancialDataService);
+  store = inject(appSignalStore);
+  
+  tickerListSignal = signal<string[]>(['otro...', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'ORCL', 'NVDA', 'IBM', 'INTC']);
 
-  onChangeTicker(newTicker: string) {
-    tickerSignal.set(newTicker);
-    this.financialDataService.getDataSetPromise(tickerSignal(), new Date('2025-11-01'), new Date('2025-12-01'))
-    .then((dataPoints: DataPointType[]) => {
-      datasetSubject.next(dataPoints);
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);
-    });
+  onChangeTimeSpan(event: any) {
+    const months = parseInt(event.value, 10);
+    this.store.setTimeSpan(months)
   }
 
+  onChangeTicker(newTicker: string) {
+    const ticker = newTicker;
+    this.store.setTicker(ticker)
+  }
 }
